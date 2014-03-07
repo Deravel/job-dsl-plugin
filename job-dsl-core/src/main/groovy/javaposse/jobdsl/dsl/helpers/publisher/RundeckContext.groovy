@@ -6,23 +6,31 @@ import javaposse.jobdsl.dsl.helpers.Context
 
 class RundeckContext implements Context {
     String jobId
-    String options
-    String nodeFilters
-    String tag
-    boolean shouldWaitForRundeckJob
-    boolean shouldFailTheBuild
+    Map<String, String> options = [:]
+    Map<String, String> nodeFilters = [:]
+    String tag = ''
+    boolean shouldWaitForRundeckJob = true
+    boolean shouldFailTheBuild = true
 
     void jobId(String jobId) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(jobId) , 'jobId cannot be null')
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(jobId), 'jobId cannot be null or empty')
         this.jobId = jobId
     }
 
-    void options(String options) {
+    void options(Map<String, String> options) {
         this.options = options
     }
 
-    void nodeFilters(String nodeFilters) {
+    void option(String key, String value) {
+        options[key] = value
+    }
+
+    void nodeFilters(Map<String, String> nodeFilters) {
         this.nodeFilters = nodeFilters
+    }
+
+    void nodeFilter(String key, String value) {
+        nodeFilters[key] = value
     }
 
     void tag(String tag) {

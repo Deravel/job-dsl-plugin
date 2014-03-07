@@ -966,8 +966,8 @@ class PublisherContext implements Context {
     /**
      * <org.jenkinsci.plugins.rundeck.RundeckNotifier>
      *     <jobId>b4c1a982-d872-4a2b-aba4-f355371b2a8f</jobId>
-     *     <options> option1 option2 </options>
-     *     <nodeFilters/>
+     *     <options> key1=value1 key2=value2 </options>
+     *     <nodeFilters> key1=value1 key2=value2 </nodeFilters>
      *     <tag/>
      *     <shouldWaitForRundeckJob>true</shouldWaitForRundeckJob>
      *     <shouldFailTheBuild>true</shouldFailTheBuild>
