@@ -962,4 +962,30 @@ class PublisherContext implements Context {
     def githubCommitNotifier() {
         publisherNodes << new NodeBuilder().'com.cloudbees.jenkins.GitHubCommitNotifier'()
     }
+
+    /**
+     * <org.jenkinsci.plugins.rundeck.RundeckNotifier>
+     *     <jobId>b4c1a982-d872-4a2b-aba4-f355371b2a8f</jobId>
+     *     <options> option1 option2 </options>
+     *     <nodeFilters/>
+     *     <tag/>
+     *     <shouldWaitForRundeckJob>true</shouldWaitForRundeckJob>
+     *     <shouldFailTheBuild>true</shouldFailTheBuild>
+     * </org.jenkinsci.plugins.rundeck.RundeckNotifier>
+     */
+    def rundeck(Closure rundeckClosure) {
+        RundeckContext rundeckContext = new RundeckContext()
+        AbstractContextHelper.executeInContext(rundeckClosure, rundeckContext)
+
+        Node rundeckNode = NodeBuilder.newInstance().'org.jenkinsci.plugins.rundeck.RundeckNotifier' {
+            jobId rundeckContext.jobId
+            options rundeckContext.options
+            nodeFilters rundeckContext.nodeFilters
+            tag rundeckContext.tag
+            shouldWaitForRundeckJob rundeckContext.shouldWaitForRundeckJob
+            shouldFailTheBuild rundeckContext.shouldFailTheBuild
+        }
+
+        publisherNodes << rundeckNode
+    }
 }

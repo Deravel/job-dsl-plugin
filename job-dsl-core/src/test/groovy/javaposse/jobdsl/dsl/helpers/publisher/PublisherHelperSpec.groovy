@@ -1563,4 +1563,42 @@ public class PublisherHelperSpec extends Specification {
         def githubCommitNotifier = context.publisherNodes[0]
         githubCommitNotifier.name() == 'com.cloudbees.jenkins.GitHubCommitNotifier'
     }
+
+    def 'call rundeck with all args should create valid rundeck node'() {
+        when:
+        context.rundeck {
+            jobId 'jobId'
+            options 'option1 option2'
+            nodeFilters ''
+            tag ''
+            shouldWaitForRundeckJob true
+            shouldFailTheBuild true
+        }
+
+        then:
+        Node rundeckNode = context.publisherNodes[0]
+        rundeckNode.name() == 'org.jenkinsci.plugins.rundeck.RundeckNotifier'
+        rundeckNode.jobId[0].value() == "jobId"
+        rundeckNode.options[0].value() == "option1 option2"
+        rundeckNode.nodeFilters[0].value() == ""
+        rundeckNode.tag[0].value() == ""
+        rundeckNode.shouldWaitForRundeckJob[0].value() == true
+        rundeckNode.shouldFailTheBuild[0].value() == true
+    }
+
+    def 'call rundeck with no jobId should fail'() {
+        when:
+        context.rundeck {
+            jobId ''
+            options 'option1, option2'
+            nodeFilters ''
+            tag ''
+            shouldWaitForRundeckJob true
+            shouldFailTheBuild true
+        }
+
+        then:
+        IllegalArgumentException exception = thrown()
+        exception.message == "jobId cannot be null"
+    }
 }
