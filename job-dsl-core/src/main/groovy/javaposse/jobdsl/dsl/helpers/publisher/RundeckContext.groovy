@@ -9,8 +9,8 @@ class RundeckContext implements Context {
     Map<String, String> options = [:]
     Map<String, String> nodeFilters = [:]
     String tag = ''
-    boolean shouldWaitForRundeckJob = true
-    boolean shouldFailTheBuild = true
+    boolean shouldWaitForRundeckJob
+    boolean shouldFailTheBuild
 
     void jobId(String jobId) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(jobId), 'jobId cannot be null or empty')
@@ -37,11 +37,11 @@ class RundeckContext implements Context {
         this.tag = tag
     }
 
-    void shouldWaitForRundeckJob(boolean shouldWaitForRundeckJob) {
+    void shouldWaitForRundeckJob(boolean shouldWaitForRundeckJob = true) {
         this.shouldWaitForRundeckJob = shouldWaitForRundeckJob
     }
 
-    void shouldFailTheBuild(boolean shouldFailTheBuild) {
+    void shouldFailTheBuild(boolean shouldFailTheBuild = true) {
         this.shouldFailTheBuild = shouldFailTheBuild
     }
 }

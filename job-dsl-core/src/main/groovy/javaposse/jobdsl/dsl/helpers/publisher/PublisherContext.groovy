@@ -979,8 +979,8 @@ class PublisherContext implements Context {
 
         Node rundeckNode = NodeBuilder.newInstance().'org.jenkinsci.plugins.rundeck.RundeckNotifier' {
             jobId rundeckContext.jobId
-            options rundeckContext.options
-            nodeFilters rundeckContext.nodeFilters
+            options rundeckContext.options.collect { key, value -> "${key}=${value}" }.join(' ')
+            nodeFilters rundeckContext.nodeFilters.collect { key, value -> "${key}=${value}" }.join(' ')
             tag rundeckContext.tag
             shouldWaitForRundeckJob rundeckContext.shouldWaitForRundeckJob
             shouldFailTheBuild rundeckContext.shouldFailTheBuild

@@ -1573,7 +1573,7 @@ public class PublisherHelperSpec extends Specification {
             nodeFilters key1:'value1', key2:'value2'
             nodeFilter 'key3', 'value3'
             tag 'tag'
-            shouldWaitForRundeckJob
+            shouldWaitForRundeckJob()
             shouldFailTheBuild false
         }
 
@@ -1581,8 +1581,8 @@ public class PublisherHelperSpec extends Specification {
         Node rundeckNode = context.publisherNodes[0]
         rundeckNode.name() == 'org.jenkinsci.plugins.rundeck.RundeckNotifier'
         rundeckNode.jobId[0].value() == 'jobId'
-        rundeckNode.options[0].attributes() == ['key1': 'value1', 'key2': 'value2', 'key3': 'value3']
-        rundeckNode.nodeFilters[0].attributes() == ['key1':'value1', 'key2':'value2', 'key3':'value3']
+        rundeckNode.options[0].value() == 'key1=value1 key2=value2 key3=value3'
+        rundeckNode.nodeFilters[0].value() == 'key1=value1 key2=value2 key3=value3'
         rundeckNode.tag[0].value() == 'tag'
         rundeckNode.shouldWaitForRundeckJob[0].value() == true
         rundeckNode.shouldFailTheBuild[0].value() == false
@@ -1615,7 +1615,7 @@ public class PublisherHelperSpec extends Specification {
         rundeckNode.options[0].attributes().isEmpty()
         rundeckNode.nodeFilters[0].attributes().isEmpty()
         rundeckNode.tag[0].value() == ''
-        rundeckNode.shouldWaitForRundeckJob[0].value() == true
-        rundeckNode.shouldFailTheBuild[0].value() == true
+        rundeckNode.shouldWaitForRundeckJob[0].value() == false
+        rundeckNode.shouldFailTheBuild[0].value() == false
     }
 }
