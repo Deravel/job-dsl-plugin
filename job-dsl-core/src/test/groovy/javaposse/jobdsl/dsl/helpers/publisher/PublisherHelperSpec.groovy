@@ -246,15 +246,15 @@ public class PublisherHelperSpec extends Specification {
             exclusionPattern 'exclusiondir'
             minimumInstructionCoverage '1'
             minimumBranchCoverage '2'
-            minimumComplexityCoverage '3'
-            minimumLineCoverage '4'
-            minimumMethodCoverage '5'
-            minimumClassCoverage '6'
-            maximumInstructionCoverage '7'
-            maximumBranchCoverage '8'
-            maximumComplexityCoverage '9'
-            maximumLineCoverage '10'
-            maximumMethodCoverage '11'
+            minimumComplexityCoverage '3' 
+            minimumLineCoverage '4' 
+            minimumMethodCoverage '5' 
+            minimumClassCoverage '6' 
+            maximumInstructionCoverage '7' 
+            maximumBranchCoverage '8' 
+            maximumComplexityCoverage '9' 
+            maximumLineCoverage '10' 
+            maximumMethodCoverage '11' 
             maximumClassCoverage '12'
             changeBuildStatus true
         }
@@ -1462,7 +1462,7 @@ public class PublisherHelperSpec extends Specification {
         then:
         thrown(IllegalArgumentException)
     }
-
+    
     def 'publish Robot framework report using default values'() {
         when:
         context.publishRobotFrameworkReports()
