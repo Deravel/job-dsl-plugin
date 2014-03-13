@@ -1566,8 +1566,7 @@ public class PublisherHelperSpec extends Specification {
 
     def 'call rundeck with all args should create valid rundeck node'() {
         when:
-        context.rundeck {
-            jobId 'jobId'
+        context.rundeck('jobId') {
             options key1:'value1', key2:'value2'
             option 'key3', 'value3'
             nodeFilters key1:'value1', key2:'value2'
@@ -1590,13 +1589,11 @@ public class PublisherHelperSpec extends Specification {
 
     def 'call rundeck with invalid jobId should fail'() {
         when:
-        context.rundeck {
-            jobId id
-        }
+        context.rundeck(id)
 
         then:
         IllegalArgumentException exception = thrown()
-        exception.message == "jobId cannot be null or empty"
+        exception.message == "jobIdentifier cannot be null or empty"
 
         where:
         id   | _
@@ -1606,14 +1603,12 @@ public class PublisherHelperSpec extends Specification {
 
     def 'call rundeck with default values'() {
         when:
-        context.rundeck {
-            jobId 'jobId'
-        }
+        context.rundeck('jobId')
 
         then:
         Node rundeckNode = context.publisherNodes[0]
-        rundeckNode.options[0].attributes().isEmpty()
-        rundeckNode.nodeFilters[0].attributes().isEmpty()
+        rundeckNode.options[0].value().isEmpty()
+        rundeckNode.nodeFilters[0].value().isEmpty()
         rundeckNode.tag[0].value() == ''
         rundeckNode.shouldWaitForRundeckJob[0].value() == false
         rundeckNode.shouldFailTheBuild[0].value() == false

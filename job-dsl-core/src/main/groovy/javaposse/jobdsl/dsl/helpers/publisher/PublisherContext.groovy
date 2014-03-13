@@ -1,5 +1,7 @@
 package javaposse.jobdsl.dsl.helpers.publisher
 
+import com.google.common.base.Preconditions
+import com.google.common.base.Strings
 import javaposse.jobdsl.dsl.WithXmlAction
 import javaposse.jobdsl.dsl.helpers.AbstractContextHelper
 import javaposse.jobdsl.dsl.helpers.Context
@@ -973,12 +975,13 @@ class PublisherContext implements Context {
      *     <shouldFailTheBuild>true</shouldFailTheBuild>
      * </org.jenkinsci.plugins.rundeck.RundeckNotifier>
      */
-    def rundeck(Closure rundeckClosure) {
+    def rundeck(String jobIdentifier, Closure rundeckClosure = null) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(jobIdentifier), 'jobIdentifier cannot be null or empty')
         RundeckContext rundeckContext = new RundeckContext()
         AbstractContextHelper.executeInContext(rundeckClosure, rundeckContext)
 
         Node rundeckNode = NodeBuilder.newInstance().'org.jenkinsci.plugins.rundeck.RundeckNotifier' {
-            jobId rundeckContext.jobId
+            jobId jobIdentifier
             options rundeckContext.options.collect { key, value -> "${key}=${value}" }.join(' ')
             nodeFilters rundeckContext.nodeFilters.collect { key, value -> "${key}=${value}" }.join(' ')
             tag rundeckContext.tag
