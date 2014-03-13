@@ -1,5 +1,7 @@
 package javaposse.jobdsl.dsl.helpers.publisher
 
+import com.google.common.base.Preconditions
+import com.google.common.base.Strings
 import javaposse.jobdsl.dsl.WithXmlAction
 import javaposse.jobdsl.dsl.helpers.AbstractContextHelper
 import javaposse.jobdsl.dsl.helpers.Context
@@ -227,6 +229,7 @@ class PublisherContext implements Context {
      <maximumLineCoverage>0</maximumLineCoverage>
      <maximumMethodCoverage>0</maximumMethodCoverage>
      <maximumClassCoverage>0</maximumClassCoverage>
+     <changeBuildStatus>false</changeBuildStatus>
      </hudson.plugins.jacoco.JacocoPublisher>
      **/
     def jacocoCodeCoverage(Closure jacocoClosure = null) {
@@ -254,6 +257,9 @@ class PublisherContext implements Context {
             maximumLineCoverage jacocoContext.maximumLineCoverage
             maximumMethodCoverage jacocoContext.maximumMethodCoverage
             maximumClassCoverage jacocoContext.maximumClassCoverage
+            if (jacocoContext.changeBuildStatus != null) {
+                changeBuildStatus Boolean.toString(jacocoContext.changeBuildStatus)
+            }
         }
 
         publisherNodes << jacocoNode
@@ -957,5 +963,32 @@ class PublisherContext implements Context {
      */
     def githubCommitNotifier() {
         publisherNodes << new NodeBuilder().'com.cloudbees.jenkins.GitHubCommitNotifier'()
+    }
+
+    /**
+     * <org.jenkinsci.plugins.rundeck.RundeckNotifier>
+     *     <jobId>b4c1a982-d872-4a2b-aba4-f355371b2a8f</jobId>
+     *     <options> key1=value1 key2=value2 </options>
+     *     <nodeFilters> key1=value1 key2=value2 </nodeFilters>
+     *     <tag/>
+     *     <shouldWaitForRundeckJob>true</shouldWaitForRundeckJob>
+     *     <shouldFailTheBuild>true</shouldFailTheBuild>
+     * </org.jenkinsci.plugins.rundeck.RundeckNotifier>
+     */
+    def rundeck(String jobIdentifier, Closure rundeckClosure = null) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(jobIdentifier), 'jobIdentifier cannot be null or empty')
+        RundeckContext rundeckContext = new RundeckContext()
+        AbstractContextHelper.executeInContext(rundeckClosure, rundeckContext)
+
+        Node rundeckNode = NodeBuilder.newInstance().'org.jenkinsci.plugins.rundeck.RundeckNotifier' {
+            jobId jobIdentifier
+            options rundeckContext.options.collect { key, value -> "${key}=${value}" }.join(' ')
+            nodeFilters rundeckContext.nodeFilters.collect { key, value -> "${key}=${value}" }.join(' ')
+            tag rundeckContext.tag
+            shouldWaitForRundeckJob rundeckContext.shouldWaitForRundeckJob
+            shouldFailTheBuild rundeckContext.shouldFailTheBuild
+        }
+
+        publisherNodes << rundeckNode
     }
 }

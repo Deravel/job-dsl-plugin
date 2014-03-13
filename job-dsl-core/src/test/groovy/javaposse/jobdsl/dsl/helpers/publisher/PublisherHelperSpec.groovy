@@ -201,9 +201,41 @@ public class PublisherHelperSpec extends Specification {
         Node jacocoNode = context.publisherNodes[0]
         jacocoNode.name() == 'hudson.plugins.jacoco.JacocoPublisher'
         jacocoNode.execPattern[0].value() == '**/target/**.exec'
-        jacocoNode.minimumInstructionCoverage[0].value() == "0"             
+        jacocoNode.minimumInstructionCoverage[0].value() == "0"
+        jacocoNode.changeBuildStatus[0] == null
     }
-   
+
+    def 'call jacoco code coverage with closure, set changeBuildStatus'(change) {
+        when:
+
+        context.jacocoCodeCoverage {
+            changeBuildStatus(change)
+        }
+
+        then:
+        Node jacocoNode = context.publisherNodes[0]
+        jacocoNode.name() == 'hudson.plugins.jacoco.JacocoPublisher'
+        jacocoNode.changeBuildStatus[0].value() == change ? 'true' : 'false'
+
+        where:
+        change << [true, false]
+    }
+
+    def 'call jacoco code coverage with closure, changeBuildStatus with no args defaults to true'() {
+        when:
+
+        context.jacocoCodeCoverage {
+            changeBuildStatus()
+        }
+
+        then:
+        Node jacocoNode = context.publisherNodes[0]
+        jacocoNode.name() == 'hudson.plugins.jacoco.JacocoPublisher'
+        jacocoNode.execPattern[0].value() == '**/target/**.exec'
+        jacocoNode.minimumInstructionCoverage[0].value() == "0"
+        jacocoNode.changeBuildStatus[0].value() == 'true'
+    }
+
     def 'call jacoco code coverage with all args'() {
         when:
         context.jacocoCodeCoverage {
@@ -224,6 +256,7 @@ public class PublisherHelperSpec extends Specification {
             maximumLineCoverage '10' 
             maximumMethodCoverage '11' 
             maximumClassCoverage '12'
+            changeBuildStatus true
         }
 
         then:
@@ -246,6 +279,7 @@ public class PublisherHelperSpec extends Specification {
         jacocoNode.maximumLineCoverage[0].value() == "10"
         jacocoNode.maximumMethodCoverage[0].value() == "11"
         jacocoNode.maximumClassCoverage[0].value() == "12"
+        jacocoNode.changeBuildStatus[0].value() == 'true'
     }
 
     def 'calling minimal html publisher'() {
@@ -1528,5 +1562,55 @@ public class PublisherHelperSpec extends Specification {
         context.publisherNodes.size() == 1
         def githubCommitNotifier = context.publisherNodes[0]
         githubCommitNotifier.name() == 'com.cloudbees.jenkins.GitHubCommitNotifier'
+    }
+
+    def 'call rundeck with all args should create valid rundeck node'() {
+        when:
+        context.rundeck('jobId') {
+            options key1:'value1', key2:'value2'
+            option 'key3', 'value3'
+            nodeFilters key1:'value1', key2:'value2'
+            nodeFilter 'key3', 'value3'
+            tag 'tag'
+            shouldWaitForRundeckJob()
+            shouldFailTheBuild false
+        }
+
+        then:
+        Node rundeckNode = context.publisherNodes[0]
+        rundeckNode.name() == 'org.jenkinsci.plugins.rundeck.RundeckNotifier'
+        rundeckNode.jobId[0].value() == 'jobId'
+        rundeckNode.options[0].value() == 'key1=value1 key2=value2 key3=value3'
+        rundeckNode.nodeFilters[0].value() == 'key1=value1 key2=value2 key3=value3'
+        rundeckNode.tag[0].value() == 'tag'
+        rundeckNode.shouldWaitForRundeckJob[0].value() == true
+        rundeckNode.shouldFailTheBuild[0].value() == false
+    }
+
+    def 'call rundeck with invalid jobId should fail'() {
+        when:
+        context.rundeck(id)
+
+        then:
+        IllegalArgumentException exception = thrown()
+        exception.message == "jobIdentifier cannot be null or empty"
+
+        where:
+        id   | _
+        null | _
+        ''   | _
+    }
+
+    def 'call rundeck with default values'() {
+        when:
+        context.rundeck('jobId')
+
+        then:
+        Node rundeckNode = context.publisherNodes[0]
+        rundeckNode.options[0].value().isEmpty()
+        rundeckNode.nodeFilters[0].value().isEmpty()
+        rundeckNode.tag[0].value() == ''
+        rundeckNode.shouldWaitForRundeckJob[0].value() == false
+        rundeckNode.shouldFailTheBuild[0].value() == false
     }
 }
